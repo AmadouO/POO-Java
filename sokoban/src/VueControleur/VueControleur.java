@@ -1,6 +1,6 @@
 package VueControleur;
 
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.Color;
+
 
 
 import modele.*;
@@ -141,7 +143,14 @@ public class VueControleur extends JFrame implements Observer {
                             tabJLabel[x][y].setIcon(icoVide);
                         }
                     }
-
+                    if (c instanceof CaseCible ){
+                        tabJLabel[x][y].setOpaque(true);
+                        tabJLabel[x][y].setBackground(Color.RED);
+                    }
+                    if (c instanceof CaseGlasse){
+                        tabJLabel[x][y].setOpaque(true);
+                        tabJLabel[x][y].setBackground(Color.BLUE);
+                    }
 
 
                 }

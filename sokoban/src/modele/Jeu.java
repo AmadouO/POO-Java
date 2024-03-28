@@ -24,7 +24,7 @@ public class Jeu extends Observable {
 
     private Heros heros;
 
-    private HashMap<Case, Point> map = new  HashMap<Case, Point>(); // permet de récupérer la position d'une case à partir de sa référence
+    public HashMap<Case, Point> map = new  HashMap<Case, Point>(); // permet de récupérer la position d'une case à partir de sa référence
     private Case[][] grilleEntites = new Case[SIZE_X][SIZE_Y]; // permet de récupérer une case à partir de ses coordonnées
 
 
@@ -43,6 +43,14 @@ public class Jeu extends Observable {
     
     public Heros getHeros() {
         return heros;
+    }
+
+    public Case getPos(int x, int y) {
+        if (contenuDansGrille(new Point(x, y))) {
+            return grilleEntites[x][y];
+        } else {
+            return null;
+        }
     }
 
     public void deplacerHeros(Direction d) {
@@ -95,14 +103,17 @@ public class Jeu extends Observable {
                         case 'M' :
                             addCase(new Mur(this),x,y);
                             break;
-                        case 'P' :
+                        case 'C' :
+                            addCase(new CaseCible(this),x,y);
+                            break;
+                        case 'G' :
+                            addCase(new CaseGlasse(this),x,y);
                             break;
                     }
                 }
                 y++;
             }
             heros = new Heros(this, grilleEntites[4][4]);
-
             Bloc b = new Bloc(this, grilleEntites[6][6]);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -127,6 +138,12 @@ public class Jeu extends Observable {
         Point pCible = calculerPointCible(pCourant, d);
 
         if (contenuDansGrille(pCible)) {
+            Case caseCible = getPos(pCible.x, pCible.y);
+            if (caseCible != null && caseCible.getEntite() == null) {
+                if (caseCible instanceof CaseGlasse) {
+                    return ((CaseGlasse) caseCible).glisser(e, d);
+                }
+            }
             Entite eCible = caseALaPosition(pCible).getEntite();
             if (eCible != null) {
                 eCible.pousser(d);
@@ -138,18 +155,17 @@ public class Jeu extends Observable {
                 caseALaPosition(pCible).entrerSurLaCase(e);
 
             } else {
-                retour = false;
+                return false;
             }
 
         } else {
-            retour = false;
+            return false;
         }
-
-        return retour;
+        return true;
     }
     
     
-    private Point calculerPointCible(Point pCourant, Direction d) {
+    public Point calculerPointCible(Point pCourant, Direction d) {
         Point pCible = null;
         
         switch(d) {
@@ -167,7 +183,7 @@ public class Jeu extends Observable {
     
     /** Indique si p est contenu dans la grille
      */
-    private boolean contenuDansGrille(Point p) {
+    public boolean contenuDansGrille(Point p) {
         return p.x >= 0 && p.x < SIZE_X && p.y >= 0 && p.y < SIZE_Y;
     }
     
